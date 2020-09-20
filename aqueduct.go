@@ -6,15 +6,18 @@ import (
 	"time"
 
 	"github.com/bdkiran/aqueduct/api"
+	"github.com/bdkiran/aqueduct/persist"
 )
 
 func main() {
-
 	router := api.NewRouter()
 	port := ":8080"
 
-	log.Printf("Server is launched at port %s", port)
+	mongoUsername := "username"
+	mongoPassword := "password"
+	persist.InitMongoClient(mongoUsername, mongoPassword)
 
+	log.Printf("Server is launched at port %s", port)
 	srv := &http.Server{
 		Handler:      router,
 		Addr:         port,
@@ -23,4 +26,5 @@ func main() {
 	}
 
 	log.Fatal(srv.ListenAndServe())
+	defer persist.DisconnectClient()
 }

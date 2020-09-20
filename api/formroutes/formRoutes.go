@@ -11,6 +11,7 @@ import (
 )
 
 //FormHandler handles post request that contain form data. Currently processes JSON and url-endcoded payloads
+//If this solution is to truely work, we need to handle: honeypot processing, custom-url redirect
 func FormHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Form handler called")
 
@@ -47,8 +48,26 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 		response.SendFailResponse(w, "Unable to parse format")
 		return
 	}
-	log.Println(string(formContent))
-	response.SendSuccessResponse(w, "Great success")
+	//Check honeypot field
+	isSpam := honeyPotCheck(formContent)
+	if isSpam {
+		log.Println("Form is spam.....")
+		//Dont send email to user
+		//Dont store form
+	}
+
+	//If honeypot fails, lets not do this step??
+	//check redirect field
+	redirectURL := checkRedirectURL(formContent)
+	//If no redirect is specified just use the generic thank you page
+	if redirectURL == "" {
+		redirectURL = "/thanks/"
+	}
+
+	//send email
+
+	//Create thank you redirect page.
+	http.Redirect(w, r, redirectURL, http.StatusSeeOther)
 }
 
 func parseURLEncodedData(r *http.Request) ([]byte, error) {
@@ -60,7 +79,7 @@ func parseURLEncodedData(r *http.Request) ([]byte, error) {
 	//Make a map of url encoded data
 	mapData := make(map[string]string)
 	for key, value := range r.Form {
-		log.Printf("key: %s, value: %s", key, value[0])
+		//log.Printf("key: %s, value: %s", key, value[0])
 		mapData[key] = value[0]
 	}
 	//Convert the map into a json object
@@ -78,4 +97,39 @@ func parseJSONEndcodedData(r *http.Request) ([]byte, error) {
 		return nil, err
 	}
 	return jsn, nil
+}
+
+func honeyPotCheck(formJSONObj []byte) bool {
+	var formMap map[string]interface{}
+	err := json.Unmarshal(formJSONObj, &formMap)
+	//this should never happen....
+	if err != nil {
+		log.Println("Big Error")
+	}
+	//Check if the honeypot field is contained in the form.
+	if honeyValue, ok := formMap["honeypot"]; ok {
+		if honeyValue != "" {
+			return true
+		}
+		return false
+	}
+	return false
+}
+
+func checkRedirectURL(formJSONObj []byte) string {
+	var formMap map[string]interface{}
+	err := json.Unmarshal(formJSONObj, &formMap)
+	//this should never happen....
+	if err != nil {
+		log.Println("Big Error")
+	}
+	//Check if the honeypot field is contained in the form.
+	if redirectValue, ok := formMap["redirectTo"]; ok {
+		if str, okay := redirectValue.(string); okay {
+			//Do a quick website reg ex check?s
+			return str
+		}
+		return ""
+	}
+	return ""
 }

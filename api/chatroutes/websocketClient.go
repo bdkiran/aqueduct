@@ -9,6 +9,7 @@ import (
 
 var upgrader = websocket.Upgrader{} // use default options
 
+//Probably want to change this module to a generic websocket client handler
 func messageHandler(w http.ResponseWriter, r *http.Request) {
 	c, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
