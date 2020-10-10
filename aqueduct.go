@@ -13,9 +13,9 @@ func main() {
 	router := api.NewRouter()
 	port := ":8080"
 
-	mongoUsername := "username"
-	mongoPassword := "password"
-	persist.InitMongoClient(mongoUsername, mongoPassword)
+	// mongoUsername := "admin"
+	// mongoPassword := "aqueductpassword"
+	// persist.InitMongoClient(mongoUsername, mongoPassword)
 
 	log.Printf("Server is launched at port %s", port)
 	srv := &http.Server{

@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	chatapi "github.com/bdkiran/aqueduct/api/chatroutes"
 	"github.com/bdkiran/aqueduct/api/formroutes"
 	"github.com/bdkiran/aqueduct/api/users"
 	"github.com/gorilla/handlers"
@@ -23,6 +24,7 @@ func NewRouter() http.Handler {
 
 	//Register the user routes
 	users.Register(router)
+	chatapi.RegisterConnection(router)
 
 	//Only certain routes should be CORS like the form and chat routes?
 	headersOk := handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "X-Requested-With", "Content-Type", "Authorization"})
