@@ -15,7 +15,7 @@ var mongoClient *mongo.Client
 //InitMongoClient initializes a conection to MongoDb
 func InitMongoClient(userName string, password string) {
 	log.Println("Establishing Connection to mongoDB")
-	atlasConnectionString := "mongodb+srv://%s:%s@aquealpha.t9mtx.mongodb.net/aqueduct?retryWrites=true&w=majority"
+	atlasConnectionString := "mongoConnectionString
 	connectionURI := fmt.Sprintf(atlasConnectionString, userName, password)
 	clientOptions := options.Client().ApplyURI(connectionURI)
 
